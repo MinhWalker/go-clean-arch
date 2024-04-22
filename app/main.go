@@ -45,6 +45,7 @@ func main() {
 	val.Add("loc", "Asia/Jakarta")
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
 	dbConn, err := sql.Open(`mysql`, dsn)
+	dbConn.SetConnMaxLifetime(time.Second)
 	if err != nil {
 		log.Fatal("failed to open connection to database", err)
 	}

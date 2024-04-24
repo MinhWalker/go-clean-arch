@@ -36,7 +36,7 @@ func TestFetchArticle(t *testing.T) {
 		AddRow(mockArticles[1].ID, mockArticles[1].Title, mockArticles[1].Content,
 			mockArticles[1].Author.ID, mockArticles[1].UpdatedAt, mockArticles[1].CreatedAt)
 
-	query := "SELECT id,title,content, author_id, updated_at, created_at FROM article WHERE created_at > \\? ORDER BY created_at LIMIT \\?"
+	query := "SELECT id,title,content, author_id, updated_at, created_at FROM service WHERE created_at > \\? ORDER BY created_at LIMIT \\?"
 
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	a := articleMysqlRepo.NewArticleRepository(db)
@@ -57,7 +57,7 @@ func TestGetArticleByID(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "title", "content", "author_id", "updated_at", "created_at"}).
 		AddRow(1, "title 1", "Content 1", 1, time.Now(), time.Now())
 
-	query := "SELECT id,title,content, author_id, updated_at, created_at FROM article WHERE ID = \\?"
+	query := "SELECT id,title,content, author_id, updated_at, created_at FROM service WHERE ID = \\?"
 
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	a := articleMysqlRepo.NewArticleRepository(db)
@@ -85,7 +85,7 @@ func TestStoreArticle(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	query := "INSERT  article SET title=\\? , content=\\? , author_id=\\?, updated_at=\\? , created_at=\\?"
+	query := "INSERT  service SET title=\\? , content=\\? , author_id=\\?, updated_at=\\? , created_at=\\?"
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(ar.Title, ar.Content, ar.Author.ID, ar.CreatedAt, ar.UpdatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
 
@@ -105,7 +105,7 @@ func TestGetArticleByTitle(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "title", "content", "author_id", "updated_at", "created_at"}).
 		AddRow(1, "title 1", "Content 1", 1, time.Now(), time.Now())
 
-	query := "SELECT id,title,content, author_id, updated_at, created_at FROM article WHERE title = \\?"
+	query := "SELECT id,title,content, author_id, updated_at, created_at FROM service WHERE title = \\?"
 
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	a := articleMysqlRepo.NewArticleRepository(db)
@@ -122,7 +122,7 @@ func TestDeleteArticle(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	query := "DELETE FROM article WHERE id = \\?"
+	query := "DELETE FROM service WHERE id = \\?"
 
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(12).WillReturnResult(sqlmock.NewResult(12, 1))
@@ -153,7 +153,7 @@ func TestUpdateArticle(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	query := "UPDATE article set title=\\?, content=\\?, author_id=\\?, updated_at=\\? WHERE ID = \\?"
+	query := "UPDATE service set title=\\?, content=\\?, author_id=\\?, updated_at=\\? WHERE ID = \\?"
 
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(ar.Title, ar.Content, ar.Author.ID, ar.UpdatedAt, ar.ID).WillReturnResult(sqlmock.NewResult(12, 1))

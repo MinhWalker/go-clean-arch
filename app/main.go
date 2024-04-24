@@ -14,9 +14,9 @@ import (
 
 	mysqlRepo "github.com/bxcodec/go-clean-arch/internal/repository/mysql"
 
-	"github.com/bxcodec/go-clean-arch/article"
 	"github.com/bxcodec/go-clean-arch/internal/rest"
 	"github.com/bxcodec/go-clean-arch/internal/rest/middleware"
+	"github.com/bxcodec/go-clean-arch/service"
 	"github.com/joho/godotenv"
 )
 
@@ -45,7 +45,7 @@ func main() {
 	val.Add("loc", "Asia/Jakarta")
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
 	dbConn, err := sql.Open(`mysql`, dsn)
-	dbConn.SetConnMaxLifetime(time.Second)
+	dbConn.SetConnMaxLifetime(2 * time.Second)
 	if err != nil {
 		log.Fatal("failed to open connection to database", err)
 	}
@@ -78,7 +78,7 @@ func main() {
 	articleRepo := mysqlRepo.NewArticleRepository(dbConn)
 
 	// Build service Layer
-	svc := article.NewService(articleRepo, authorRepo)
+	svc := service.NewService(articleRepo, authorRepo)
 	rest.NewArticleHandler(e, svc)
 
 	// Start Server

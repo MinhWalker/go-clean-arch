@@ -16,12 +16,12 @@ import (
  */
 func (a *Service) fillAuthorDetails(ctx context.Context, data []domain.Article) ([]domain.Article, error) {
 	g, ctx := errgroup.WithContext(ctx)
-	// Get the author's id
 	mapAuthors := map[int64]domain.Author{}
 
 	for _, article := range data { //nolint
 		mapAuthors[article.Author.ID] = domain.Author{}
 	}
+
 	// Using goroutine to fetch the author's detail
 	chanAuthor := make(chan domain.Author)
 	for authorID := range mapAuthors {
@@ -43,7 +43,6 @@ func (a *Service) fillAuthorDetails(ctx context.Context, data []domain.Article) 
 			logrus.Error(err)
 			return
 		}
-
 	}()
 
 	for author := range chanAuthor {
@@ -56,7 +55,6 @@ func (a *Service) fillAuthorDetails(ctx context.Context, data []domain.Article) 
 		return nil, err
 	}
 
-	// merge the author's data
 	for index, item := range data { //nolint
 		if a, ok := mapAuthors[item.Author.ID]; ok {
 			data[index].Author = a

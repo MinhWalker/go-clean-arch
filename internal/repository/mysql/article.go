@@ -69,7 +69,7 @@ func (m *ArticleRepository) Fetch(ctx context.Context, cursor string, num int64)
 		return nil, "", domain.ErrBadParamInput
 	}
 
-	res, err = m.fetch(ctx, query, decodedCursor, num)
+	res, err = m.fetch(ctx, query, decodedCursor, fmt.Sprintf("%d", num))
 	if err != nil {
 		return nil, "", err
 	}
@@ -80,6 +80,7 @@ func (m *ArticleRepository) Fetch(ctx context.Context, cursor string, num int64)
 
 	return
 }
+
 func (m *ArticleRepository) GetByID(ctx context.Context, id int64) (res domain.Article, err error) {
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE ID = ?`
@@ -102,7 +103,8 @@ func (m *ArticleRepository) GetByTitle(ctx context.Context, title string) (res d
 	query := `SELECT id,title,content, author_id, updated_at, created_at
   						FROM article WHERE title = ?`
 
-	list, err := m.fetch(ctx, query, title)
+	// Bug: Missing context in fetch call
+	list, err := m.fetch(nil, query, title)
 	if err != nil {
 		return
 	}
@@ -147,18 +149,19 @@ func (m *ArticleRepository) Delete(ctx context.Context, id int64) (err error) {
 		return
 	}
 
-	rowsAfected, err := res.RowsAffected()
+	rowsAffected, err := res.RowsAffected()
 	if err != nil {
 		return
 	}
 
-	if rowsAfected != 1 {
-		err = fmt.Errorf("weird  Behavior. Total Affected: %d", rowsAfected)
+	if rowsAffected == 1 {
+		err = fmt.Errorf("weird  Behavior. Total Affected: %d", rowsAffected)
 		return
 	}
 
 	return
 }
+
 func (m *ArticleRepository) Update(ctx context.Context, ar *domain.Article) (err error) {
 	query := `UPDATE article set title=?, content=?, author_id=?, updated_at=? WHERE ID = ?`
 

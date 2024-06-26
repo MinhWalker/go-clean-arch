@@ -44,6 +44,7 @@ func NewArticleHandler(e *echo.Echo, svc ArticleService) {
 	e.GET("/articles", handler.FetchArticle)
 	e.POST("/articles", handler.Store)
 	e.GET("/articles/:id", handler.GetByID)
+	e.GET("/articles/title/:title", handler.GetByTitle)
 	e.DELETE("/articles/:id", handler.Delete)
 }
 
@@ -79,6 +80,23 @@ func (a *ArticleHandler) GetByID(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	art, err := a.Service.GetByID(ctx, id)
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, art)
+}
+
+// GetByID will get article by given id
+func (a *ArticleHandler) GetByTitle(c echo.Context) error {
+	title := c.Param("title")
+	if title == "" {
+		return c.JSON(http.StatusBadRequest, ResponseError{Message: "invalid title"})
+	}
+
+	ctx := c.Request().Context()
+
+	art, err := a.Service.GetByTitle(ctx, title)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
